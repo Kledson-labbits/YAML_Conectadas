@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionário YAML</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        h1, h2 {
+            color: #6c3a9b;
+        }
+
+        h3 {
+            color: #b851c7;
+        }
+
+        input, button {
+            font-size: 16px;
+            padding: 4px 8px;
+        }
+
+        input[type="text"], input[type="number"] {
+            border: 1px solid #6c3a9b;
+            border-radius: 4px;
+            background-color: #ffffff;
+            color: #6c3a9b;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            color: #6c3a9b;
+        }
+
+        button {
+            background-color: #b851c7;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 16px;
+            margin-bottom: 32px;
+        }
+
+        button:hover {
+            background-color: #6c3a9b;
+        }
+
+        #outputYaml {
+            background-color: #ffffff;
+            border: 1px solid #6c3a9b;
+            border-radius: 4px;
+            padding: 8px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 16px;
+            color: #6c3a9b;
+            width: 100%;
+            height: 200px;
+            resize: none;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Questionário YAML</h1>
+    <form id="questionForm">
+        <div id="questionsContainer">
+            <div class="questionBlock">
+                <h3>Pergunta 1</h3>
+                <label for="number1">Número:</label>
+                <input type="number" id="number1" required><br>
+
+                <label for="question1">Pergunta:</label>
+                <input type="text" id="question1" required><br>
+
+                <label for="rightAnswer1">Correta:</label>
+                <input type="text" id="rightAnswer1" required><br>
+
+                <label for="wrongAnswer1_1">Alternativa errada 1:</label>
+                <input type="text" id="wrongAnswer1_1" required><br>
+
+                <label for="wrongAnswer1_2">Alternativa errada 2:</label>
+                <input type="text" id="wrongAnswer1_2" required><br>
+
+                <label for="wrongAnswer1_3">Alternativa errada 3:</label>
+                <input type="text" id="wrongAnswer1_3" required><br>
+            </div>
+        </div>
+        
+        <button type="button" onclick="addQuestion()">Adicionar Pergunta</button><br><br>
+        <button type="button" onclick="generateYaml()">Gerar YAML</button>
+    </form>
+
+    <h2>Output YAML:</h2>
+    <textarea id="outputYaml" readonly></textarea><br>
+    <button type="button" onclick="copyToClipboard()">Copiar YAML</button>
+
+    <script>
+        let questionCount = 1;
+
+        function addQuestion() {
+            questionCount++;
+
+            const questionBlock = document.createElement('div');
+            questionBlock.classList.add('questionBlock');
+
+            const questionTitle = document.createElement('h3');
+            questionTitle.textContent = `Pergunta ${questionCount}`;
+            questionBlock.appendChild(questionTitle);
+
+            const inputLabels = ['Número', 'Pergunta', 'Correta', 'Alternativa errada 1', 'Alternativa errada 2', 'Alternativa errada 3'];
+            const inputIds = [`number${questionCount}`, `question${questionCount}`, `rightAnswer${questionCount}`, `wrongAnswer${questionCount}_1`, `wrongAnswer${questionCount}_2`, `wrongAnswer${questionCount}_3`];
+
+            for (let i = 0; i < inputLabels.length; i++) {
+                const label = document.createElement('label');
+                label.setAttribute('for', inputIds[i]);
+                label.textContent = inputLabels[i] + ':';
+                questionBlock.appendChild(label);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = inputIds[i];
+                input.required = true;
+                questionBlock.appendChild(input);
+
+                const br = document.createElement('br');
+                questionBlock.appendChild(br);
+            }
+
+            document.getElementById('questionsContainer').appendChild(questionBlock);
+        }
+
+        function generateYaml() {
+            let yamlOutput = '';
+
+            for (let i = 1; i <= questionCount; i++) {
+                const number = document.getElementById(`number${i}`).value;
+                const question = document.getElementById(`question${i}`).value;
+                const rightAnswer = document.getElementById(`rightAnswer${i}`).value;
+                const wrongAnswer1 = document.getElementById(`wrongAnswer${i}_1`).value;
+                const wrongAnswer2 = document.getElementById(`wrongAnswer${i}_2`).value;
+                const wrongAnswer3 = document.getElementById(`wrongAnswer${i}_3`).value;
+
+                const questionYaml = `- index: ${number}\n  gameType: 0\n  rightAnswer: ${rightAnswer}\n  noImage: 0\n  cost: 0\n  reward: 0\n  imageText: "${question}"\n  wrongAnswers:\n  - ${wrongAnswer1}\n  - ${wrongAnswer2}\n  - ${wrongAnswer3}\n  imageDescription: ""\n  number: ${number}\n`;
+
+                yamlOutput += questionYaml;
+            }
+
+            document.getElementById('outputYaml').value = yamlOutput;
+        }
+
+        function copyToClipboard() {
+            const outputYaml = document.getElementById('outputYaml');
+            outputYaml.select();
+            outputYaml.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            alert('YAML copiado para a área de transferência!');
+        }
+    </script>
+</body>
+</html>
+
